@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Note Detail{% endblock %}
+
+{% block content %}
+<div class="note-detail">
+    <h2>{{ note.title }}</h2>
+    <p>{{ note.content }}</p>
+    
+    <a href="{% url 'edit_note' note.id %}" class="btn btn-primary">Edit</a>
+    
+
+    
+    <a href="{% url 'delete_note' note.id %}" class="btn btn-danger">Delete</a>
+
+
+    <hr>
+
+    <h3>Comments:</h3>
+    {% if note.comments.exists %}
+    <ul class="comments-list">
+        {% for comment in note.comments.all %}
+        <li class="comment">
+            <p>{{ comment.text }}</p>
+            {% if comment.files.exists %}
+            <ul class="comment-files">
+                {% for file in comment.files.all %}
+                <li><a href="{{ file.file.url }}">{{ file.file.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No comments yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Add Comment Button and Modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#commentModal">
+        Add Comment
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Add Comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <textarea class="form-control" id="comment" name="text" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="files">Upload Files</label>
+                            <input type="file" class="form-control-file" id="files" name="files" multiple>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
